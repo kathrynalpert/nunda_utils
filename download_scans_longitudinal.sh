@@ -142,23 +142,24 @@ for label in ${ses_list[@]}; do
   mkdir -p $base/$slabel
   pushd $base/$slabel > /dev/null
   for scantype in $scantypes; do
-    curl --cookie JSESSIONID=$jses -X GET "$host/data/experiments/$id/scans/$scantype/${format}files?format=zip&structure=legacy" > scans.zip
-    zip -T scans.zip
+    zipfile=$label.scans.zip
+    curl --cookie JSESSIONID=$jses -X GET "$host/data/experiments/$id/scans/$scantype/${format}files?format=zip&structure=legacy" > $zipfile
+    zip -T $zipfile
     if [[ $? -ne 0 ]]; then
         login
-        curl --cookie JSESSIONID=$jses -X GET "$host/data/experiments/$id/scans/$scantype/${format}files?format=zip&structure=legacy" > scans.zip
-        zip -T scans.zip
+        curl --cookie JSESSIONID=$jses -X GET "$host/data/experiments/$id/scans/$scantype/${format}files?format=zip&structure=legacy" > $zipfile
+        zip -T $zipfile
         if [[ $? -ne 0 ]]; then
-            echo "Issue downloading $slabel $label $id, see `pwd`/scans.zip"
+            echo "Issue downloading $slabel $label $id, see `pwd`/$zipfile"
             continue
         fi
     fi
-    unzip scans.zip
+    unzip $zipfile
     if [[ $? -ne 0 ]]; then
-        echo "The curl command is failing for $label (type=$scantype). You can try running \"cat $(pwd)/scans.zip\" to debug."
+        echo "The curl command is failing for $label (type=$scantype). You can try running \"cat $(pwd)/$zipfile\" to debug."
         exit 1
     else
-        rm scans.zip
+        rm $zipfile
     fi
   done
   popd > /dev/null

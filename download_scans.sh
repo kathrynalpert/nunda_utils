@@ -153,7 +153,7 @@ for label in ${ses_list[@]}; do
             continue
         fi
     fi
-    unzip scans.zip
+    unzip $zipfile
     if [[ $? -ne 0 ]]; then
         echo "The curl command is failing for $label (type=$scantype). You can try running \"cat $(pwd)/$zipfile\" to debug."
         exit 1
